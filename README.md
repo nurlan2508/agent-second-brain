@@ -476,7 +476,7 @@ vault → .claude → skills → dbrain-processor → references → about.md
 
 1. Откройте Telegram
 2. Найдите `@BotFather`
-3. Отправьте `/newbot`
+3. Отправьте `/newbot` или откройте миниапп и создайте там новый бот
 4. Введите имя: `My Second Brain`
 5. Введите username: `my_brain_777_bot` (уникальный, заканчивается на `bot`)
 6. Скопируйте токен
