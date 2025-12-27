@@ -6,7 +6,9 @@
 
 Записывайте голосовые в Telegram - агент сам разберётся что с ними делать: создаст задачи, сохранит мысли, обновит прогресс по целям.
 
-<img width="1024" height="1968" alt="Telegram_27_December_2025_ALVR9dWM" src="https://github.com/user-attachments/assets/5f76a061-3b46-4857-b638-11783973c0ad" />
+<p align="center">
+  <img width="350" alt="Telegram_27_December_2025_ALVR9dWM" src="https://github.com/user-attachments/assets/5f76a061-3b46-4857-b638-11783973c0ad" />
+</p>
 
 ---
 
@@ -141,7 +143,9 @@
 
 <!-- TODO: Скриншот: VS Code с Welcome экраном -->
 
-<img width="1564" height="248" alt="Ghostty_27_December_2025_vPEZpgCt" src="https://github.com/user-attachments/assets/121bb943-ecf1-4827-93f4-ef59221bb49b" />
+<p align="center">
+  <img width="600" alt="Ghostty_27_December_2025_vPEZpgCt" src="https://github.com/user-attachments/assets/121bb943-ecf1-4827-93f4-ef59221bb49b" />
+</p>
 
 ---
 
@@ -152,7 +156,9 @@
 3. Введите email, придумайте пароль, выберите username
 4. Подтвердите email
 
-<img width="3022" height="2080" alt="Arc_27_December_2025_bAQJJGoP" src="https://github.com/user-attachments/assets/c09c12d8-23ee-4a2c-800e-aab564453ecd" />
+<p align="center">
+  <img width="600" alt="Arc_27_December_2025_bAQJJGoP" src="https://github.com/user-attachments/assets/c09c12d8-23ee-4a2c-800e-aab564453ecd" />
+</p>
 
 ---
 
@@ -165,7 +171,9 @@ Fork - это ваша личная копия. Все записи будут �
 3. Выберите свой аккаунт
 4. Нажмите "Create fork"
 
-<img width="2750" height="1164" alt="Arc_27_December_2025_Uw5hbtiu" src="https://github.com/user-attachments/assets/c4cd5d39-f690-456b-892d-615c36460dba" />
+<p align="center">
+  <img width="600" alt="Arc_27_December_2025_Uw5hbtiu" src="https://github.com/user-attachments/assets/c4cd5d39-f690-456b-892d-615c36460dba" />
+</p>
 
 Теперь у вас есть своя копия: `https://github.com/ВАШ_ЛОГИН/agent-second-brain`
 
@@ -216,7 +224,9 @@ Fork - это ваша личная копия. Все записи будут �
 
 <!-- TODO: Скриншот: VS Code с открытым проектом и списком папок слева -->
 
-<img width="1924" height="1554" alt="Code_27_December_2025_mBvxd2PN" src="https://github.com/user-attachments/assets/cb65c71c-8229-4caa-b958-9c636f952c72" />
+<p align="center">
+  <img width="600" alt="Code_27_December_2025_mBvxd2PN" src="https://github.com/user-attachments/assets/cb65c71c-8229-4caa-b958-9c636f952c72" />
+</p>
 
 > ⚠️ **Если случайно закрыли VS Code:**
 > 1. Откройте VS Code снова
@@ -242,7 +252,9 @@ Fork - это ваша личная копия. Все записи будут �
 
 1. В VS Code откройте файл `vault/goals/0-vision-3y.md`
 
-<img width="2422" height="2078" alt="Code_27_December_2025_iTpZrkVd" src="https://github.com/user-attachments/assets/cd30d883-c430-4282-9fb6-3fc88edf1002" />
+<p align="center">
+  <img width="600" alt="Code_27_December_2025_iTpZrkVd" src="https://github.com/user-attachments/assets/cd30d883-c430-4282-9fb6-3fc88edf1002" />
+</p>
 
 2. Выделите всё: `Ctrl+A` / `Cmd+A`
 3. Скопируйте: `Ctrl+C` / `Cmd+C`
@@ -361,7 +373,9 @@ vault → .claude → skills → dbrain-processor → references → about.md
 5. Нажмите кнопку "Commit"
 6. Нажмите ещё раз на эту же кнопку, но там будет написано "Sync Changes" или "Publish Branch"
 
- <img width="794" height="1184" alt="Antigravity_27_December_2025_2DT3p7IR" src="https://github.com/user-attachments/assets/f67958e9-8954-4d63-93d8-8cb7792abf3a" />
+<p align="center">
+  <img width="400" alt="Antigravity_27_December_2025_2DT3p7IR" src="https://github.com/user-attachments/assets/f67958e9-8954-4d63-93d8-8cb7792abf3a" />
+</p>
 
 
 Если спросит логин - введите ваш GitHub логин и пароль (или Personal Access Token).
@@ -383,7 +397,9 @@ vault → .claude → skills → dbrain-processor → references → about.md
 5. Введите username: `my_brain_777_bot` (уникальный, заканчивается на `bot`)
 6. Скопируйте токен
 
-<img width="808" height="1296" alt="Telegram_27_December_2025_QyxHhZBg" src="https://github.com/user-attachments/assets/712f661c-c63a-4c67-82b0-dc40c2e66317" />
+<p align="center">
+  <img width="350" alt="Telegram_27_December_2025_QyxHhZBg" src="https://github.com/user-attachments/assets/712f661c-c63a-4c67-82b0-dc40c2e66317" />
+</p>
 
 ---
 
@@ -402,7 +418,9 @@ vault → .claude → skills → dbrain-processor → references → about.md
 3. Settings → API Keys → Create API Key
 4. Скопируйте ключ (показывается один раз!)
 
-<img width="1700" height="1338" alt="Arc_27_December_2025_yTuxiFSA" src="https://github.com/user-attachments/assets/76d51155-7506-45f4-97b3-e4965496b266" />
+<p align="center">
+  <img width="600" alt="Arc_27_December_2025_yTuxiFSA" src="https://github.com/user-attachments/assets/76d51155-7506-45f4-97b3-e4965496b266" />
+</p>
 
 ---
 
@@ -412,7 +430,9 @@ vault → .claude → skills → dbrain-processor → references → about.md
 2. Settings → Integrations → Developer
 3. Скопируйте API token
 
-<img width="1976" height="1840" alt="Arc_27_December_2025_FlpSkZgR" src="https://github.com/user-attachments/assets/eb676e25-1633-44e4-b90e-6d066a3b46d2" />
+<p align="center">
+  <img width="600" alt="Arc_27_December_2025_FlpSkZgR" src="https://github.com/user-attachments/assets/eb676e25-1633-44e4-b90e-6d066a3b46d2" />
+</p>
 
 ---
 
@@ -435,15 +455,21 @@ vault → .claude → skills → dbrain-processor → references → about.md
 2. Выберите Ubuntu 22.04
 3. Получите на почту IP-адрес и пароль
 
-<img width="2514" height="1962" alt="Arc_27_December_2025_XNzzknIo" src="https://github.com/user-attachments/assets/9cd54275-199a-418c-9881-6be3aee471f5" />
+<p align="center">
+  <img width="600" alt="Arc_27_December_2025_XNzzknIo" src="https://github.com/user-attachments/assets/9cd54275-199a-418c-9881-6be3aee471f5" />
+</p>
 
-<img width="2212" height="1752" alt="Arc_27_December_2025_a5D7KnnM" src="https://github.com/user-attachments/assets/78d1343d-94f8-47eb-be77-4eeda1ae76ff" />
+<p align="center">
+  <img width="600" alt="Arc_27_December_2025_a5D7KnnM" src="https://github.com/user-attachments/assets/78d1343d-94f8-47eb-be77-4eeda1ae76ff" />
+</p>
 
+<p align="center">
+  <img width="600" alt="Arc_27_December_2025_tvjyMe08" src="https://github.com/user-attachments/assets/a35a8176-31fa-4417-9603-ed83b741cece" />
+</p>
 
-<img width="2162" height="2008" alt="Arc_27_December_2025_tvjyMe08" src="https://github.com/user-attachments/assets/a35a8176-31fa-4417-9603-ed83b741cece" />
-
-
-<img width="2176" height="1454" alt="Spark Desktop_27_December_2025_sltZRiMZ" src="https://github.com/user-attachments/assets/7dceb211-90af-4d78-abb0-cec19a0abbdd" />
+<p align="center">
+  <img width="600" alt="Spark Desktop_27_December_2025_sltZRiMZ" src="https://github.com/user-attachments/assets/7dceb211-90af-4d78-abb0-cec19a0abbdd" />
+</p>
 
 4. Откройте терминал и подключитесь:
 
@@ -451,7 +477,9 @@ vault → .claude → skills → dbrain-processor → references → about.md
 ssh root@ВАШ_IP_АДРЕС
 ```
 
-<img width="1450" height="810" alt="Ghostty_27_December_2025_OwCbt58A" src="https://github.com/user-attachments/assets/92b32f25-b6df-4d25-aac9-7733079cfac7" />
+<p align="center">
+  <img width="600" alt="Ghostty_27_December_2025_OwCbt58A" src="https://github.com/user-attachments/assets/92b32f25-b6df-4d25-aac9-7733079cfac7" />
+</p>
 
 ---
 
@@ -465,7 +493,9 @@ usermod -aG sudo myuser
 su - myuser
 ```
 
-<img width="1516" height="1220" alt="Ghostty_27_December_2025_4iOcEzsO" src="https://github.com/user-attachments/assets/d8e0823a-18ae-4b07-a68b-ff555a18943f" />
+<p align="center">
+  <img width="600" alt="Ghostty_27_December_2025_4iOcEzsO" src="https://github.com/user-attachments/assets/d8e0823a-18ae-4b07-a68b-ff555a18943f" />
+</p>
 
 ---
 
@@ -498,7 +528,9 @@ npm install -g @anthropic-ai/claude-code
 # Авторизация
 claude auth login
 ```
-<img width="1578" height="994" alt="Ghostty_27_December_2025_gAcpHg2c" src="https://github.com/user-attachments/assets/a4e2066d-fccb-4b6b-ba8d-8929c0709cc5" />
+<p align="center">
+  <img width="600" alt="Ghostty_27_December_2025_gAcpHg2c" src="https://github.com/user-attachments/assets/a4e2066d-fccb-4b6b-ba8d-8929c0709cc5" />
+</p>
 
 ---
 
