@@ -398,6 +398,12 @@ vault → .claude → skills → dbrain-processor → references → about.md
 
 <img width="2514" height="1962" alt="Arc_27_December_2025_XNzzknIo" src="https://github.com/user-attachments/assets/9cd54275-199a-418c-9881-6be3aee471f5" />
 
+<img width="2212" height="1752" alt="Arc_27_December_2025_a5D7KnnM" src="https://github.com/user-attachments/assets/78d1343d-94f8-47eb-be77-4eeda1ae76ff" />
+
+
+<img width="2162" height="2008" alt="Arc_27_December_2025_tvjyMe08" src="https://github.com/user-attachments/assets/a35a8176-31fa-4417-9603-ed83b741cece" />
+
+
 <img width="2176" height="1454" alt="Spark Desktop_27_December_2025_sltZRiMZ" src="https://github.com/user-attachments/assets/7dceb211-90af-4d78-abb0-cec19a0abbdd" />
 
 4. Откройте терминал и подключитесь:
