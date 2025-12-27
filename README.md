@@ -963,6 +963,9 @@ Claude прочитает файлы проекта, поймёт контекс
 
 [Obsidian](https://obsidian.md) — бесплатное приложение для просмотра заметок с красивыми связями между ними.
 
+<img width="1280" height="720" alt="image" src="https://github.com/user-attachments/assets/a5bb0499-1945-48b9-9cfe-512e75714d19" />
+
+
 **На компьютере:**
 1. Скачайте [Obsidian](https://obsidian.md) и установите
 2. Откройте Obsidian
