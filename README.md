@@ -1113,3 +1113,7 @@ git remote set-url origin https://ТОКЕН@github.com/ВАШ_ЛОГИН/agent-
 ```
 
 </details>
+
+---
+
+*Версия 1.1.27*
