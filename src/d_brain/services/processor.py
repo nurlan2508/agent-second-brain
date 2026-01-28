@@ -149,7 +149,7 @@ CRITICAL OUTPUT FORMAT:
 
             result = subprocess.run(
                 [
-                    "/home/shima/.local/bin/claude",
+                    "claude",
                     "--print",
                     "--dangerously-skip-permissions",
                     "--mcp-config",
@@ -251,7 +251,7 @@ EXECUTION:
 
             result = subprocess.run(
                 [
-                    "/home/shima/.local/bin/claude",
+                    "claude",
                     "--print",
                     "--dangerously-skip-permissions",
                     "--mcp-config",
@@ -327,7 +327,7 @@ CRITICAL OUTPUT FORMAT:
 
             result = subprocess.run(
                 [
-                    "/home/shima/.local/bin/claude",
+                    "claude",
                     "--print",
                     "--dangerously-skip-permissions",
                     "--mcp-config",
