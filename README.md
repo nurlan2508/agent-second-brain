@@ -953,6 +953,26 @@ claude auth login
 <details>
 <summary><strong>Технические детали (для продвинутых)</strong></summary>
 
+### Автоматизация
+
+Система включает автоматическую обработку записей:
+
+**Ежедневная обработка (21:00):**
+- Скрипт `scripts/process.sh` запускает Claude с dbrain-processor skill
+- Классифицирует записи, создаёт задачи в Todoist
+- Отправляет отчёт в Telegram
+- Коммитит изменения в Git
+
+**Недельный дайджест (воскресенье 20:00):**
+- Скрипт `scripts/weekly.py` генерирует сводку за неделю
+- Анализирует прогресс по целям
+- Отправляет в Telegram
+
+**Session Persistence (JSONL):**
+- Все взаимодействия сохраняются в `vault/sessions/YYYY-MM-DD.jsonl`
+- Append-only формат для надёжности
+- Методы API: `append()`, `get_today()`, `get_recent()`, `get_stats()`
+
 ### Полезные команды
 
 ```bash
