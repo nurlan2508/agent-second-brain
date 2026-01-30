@@ -4,6 +4,6 @@ Description=d-brain Daily Processing
 [Service]
 Type=oneshot
 User=shima
-WorkingDirectory=/home/shima/projects/dbrain
-ExecStart=/home/shima/projects/dbrain/scripts/process.sh
+WorkingDirectory=/home/shima/projects/agent-second-brain
+ExecStart=/home/shima/projects/agent-second-brain/scripts/process.sh
 Environment=PYTHONUNBUFFERED=1
