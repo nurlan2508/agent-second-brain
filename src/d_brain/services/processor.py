@@ -1,12 +1,13 @@
 """Claude processing service."""
 
-import json
 import logging
 import os
 import subprocess
 from datetime import date
 from pathlib import Path
 from typing import Any
+
+from d_brain.services.session import SessionStore
 
 logger = logging.getLogger(__name__)
 
@@ -38,6 +39,33 @@ class ClaudeProcessor:
         if ref_path.exists():
             return ref_path.read_text()
         return ""
+
+    def _get_session_context(self, user_id: int) -> str:
+        """Get today's session context for Claude.
+
+        Args:
+            user_id: Telegram user ID
+
+        Returns:
+            Recent session entries formatted for inclusion in prompt.
+        """
+        if user_id == 0:
+            return ""
+
+        session = SessionStore(self.vault_path)
+        today_entries = session.get_today(user_id)
+        if not today_entries:
+            return ""
+
+        lines = ["=== TODAY'S SESSION ==="]
+        for entry in today_entries[-10:]:
+            ts = entry.get("ts", "")[11:16]  # HH:MM from ISO
+            entry_type = entry.get("type", "unknown")
+            text = entry.get("text", "")[:80]
+            if text:
+                lines.append(f"{ts} [{entry_type}] {text}")
+        lines.append("=== END SESSION ===\n")
+        return "\n".join(lines)
 
     def _html_to_markdown(self, html: str) -> str:
         """Convert Telegram HTML to Obsidian Markdown."""
@@ -198,19 +226,21 @@ CRITICAL OUTPUT FORMAT:
                 "processed_entries": 0,
             }
 
-    def execute_prompt(self, user_prompt: str) -> dict[str, Any]:
+    def execute_prompt(self, user_prompt: str, user_id: int = 0) -> dict[str, Any]:
         """Execute arbitrary prompt with Claude.
 
         Args:
             user_prompt: User's natural language request
+            user_id: Telegram user ID for session context
 
         Returns:
             Execution report as dict
         """
         today = date.today()
 
-        # Load todoist reference for task operations
+        # Load context
         todoist_ref = self._load_todoist_reference()
+        session_context = self._get_session_context(user_id)
 
         prompt = f"""Ты - персональный ассистент d-brain.
 
@@ -218,7 +248,7 @@ CONTEXT:
 - Текущая дата: {today}
 - Vault path: {self.vault_path}
 
-=== TODOIST REFERENCE ===
+{session_context}=== TODOIST REFERENCE ===
 {todoist_ref}
 === END REFERENCE ===
 

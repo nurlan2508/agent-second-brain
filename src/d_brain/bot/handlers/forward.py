@@ -7,6 +7,7 @@ from aiogram import Router
 from aiogram.types import Message
 
 from d_brain.config import get_settings
+from d_brain.services.session import SessionStore
 from d_brain.services.storage import VaultStorage
 
 router = Router(name="forward")
@@ -42,6 +43,16 @@ async def handle_forward(message: Message) -> None:
 
     timestamp = datetime.fromtimestamp(message.date.timestamp())
     storage.append_to_daily(content, timestamp, msg_type)
+
+    # Log to session
+    session = SessionStore(settings.vault_path)
+    session.append(
+        message.from_user.id,
+        "forward",
+        text=content,
+        source=source_name,
+        msg_id=message.message_id,
+    )
 
     await message.answer(f"✓ Сохранено (от {source_name})")
     logger.info("Forwarded message saved from: %s", source_name)

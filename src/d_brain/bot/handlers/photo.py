@@ -7,6 +7,7 @@ from aiogram import Bot, Router
 from aiogram.types import Message
 
 from d_brain.config import get_settings
+from d_brain.services.session import SessionStore
 from d_brain.services.storage import VaultStorage
 
 router = Router(name="photo")
@@ -58,6 +59,16 @@ async def handle_photo(message: Message, bot: Bot) -> None:
             content += f"\n\n{message.caption}"
 
         storage.append_to_daily(content, timestamp, "[photo]")
+
+        # Log to session
+        session = SessionStore(settings.vault_path)
+        session.append(
+            message.from_user.id,
+            "photo",
+            path=relative_path,
+            caption=message.caption,
+            msg_id=message.message_id,
+        )
 
         await message.answer("📷 ✓ Сохранено")
         logger.info("Photo saved: %s", relative_path)

@@ -1,164 +1,106 @@
-"""JSONL-based session persistence for storing all interactions."""
+"""Session persistence service.
+
+Stores all bot interactions in JSONL format for history and analytics.
+Inspired by Clawdbot's session persistence pattern.
+"""
 
 import json
-from dataclasses import asdict, dataclass
-from datetime import date, datetime
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
 
-@dataclass
-class SessionEntry:
-    """Single session entry."""
+class SessionStore:
+    """Persistent session storage in JSONL format.
 
-    timestamp: str
-    type: str  # voice, text, photo, forward, command
-    content: str
-    metadata: dict[str, Any] | None = None
-
-    def to_dict(self) -> dict[str, Any]:
-        """Convert to dictionary for JSON serialization."""
-        return {k: v for k, v in asdict(self).items() if v is not None}
-
-
-class SessionStorage:
-    """JSONL-based session storage for append-only reliability.
-
-    Stores all interactions in daily JSONL files for later analysis
-    and context retrieval.
+    Each user gets their own session file at vault/.sessions/{user_id}.jsonl.
+    Entries are append-only for reliability and simplicity.
     """
 
-    def __init__(self, vault_path: Path) -> None:
-        self.vault_path = Path(vault_path)
-        self.sessions_path = self.vault_path / "sessions"
+    def __init__(self, vault_path: Path | str) -> None:
+        self.sessions_dir = Path(vault_path) / ".sessions"
+        self.sessions_dir.mkdir(exist_ok=True)
 
-    def _ensure_dirs(self) -> None:
-        """Ensure sessions directory exists."""
-        self.sessions_path.mkdir(parents=True, exist_ok=True)
+    def _get_session_file(self, user_id: int) -> Path:
+        return self.sessions_dir / f"{user_id}.jsonl"
 
-    def _get_session_file(self, day: date) -> Path:
-        """Get path to session file for given date."""
-        self._ensure_dirs()
-        return self.sessions_path / f"{day.isoformat()}.jsonl"
-
-    def append(
-        self,
-        entry_type: str,
-        content: str,
-        timestamp: datetime | None = None,
-        metadata: dict[str, Any] | None = None,
-    ) -> None:
-        """Append entry to session file.
+    def append(self, user_id: int, entry_type: str, **data: Any) -> None:
+        """Append entry to user's session file.
 
         Args:
-            entry_type: Type of entry (voice, text, photo, forward, command)
-            content: Entry content
-            timestamp: Entry timestamp (defaults to now)
-            metadata: Optional metadata dict
+            user_id: Telegram user ID
+            entry_type: Type of entry (voice, text, photo, forward, command, etc.)
+            **data: Additional data to store (text, duration, msg_id, etc.)
         """
-        if timestamp is None:
-            timestamp = datetime.now()
+        entry = {
+            "ts": datetime.now().astimezone().isoformat(),
+            "type": entry_type,
+            **data,
+        }
+        path = self._get_session_file(user_id)
+        with path.open("a", encoding="utf-8") as f:
+            f.write(json.dumps(entry, ensure_ascii=False) + "\n")
 
-        entry = SessionEntry(
-            timestamp=timestamp.isoformat(),
-            type=entry_type,
-            content=content,
-            metadata=metadata,
-        )
+    def get_recent(self, user_id: int, limit: int = 50) -> list[dict]:
+        """Get recent session entries.
 
-        file_path = self._get_session_file(timestamp.date())
-        with file_path.open("a", encoding="utf-8") as f:
-            f.write(json.dumps(entry.to_dict(), ensure_ascii=False) + "\n")
+        Args:
+            user_id: Telegram user ID
+            limit: Maximum number of entries to return
 
-    def get_today(self) -> list[SessionEntry]:
-        """Get all entries for today."""
-        return self.get_day(date.today())
-
-    def get_day(self, day: date) -> list[SessionEntry]:
-        """Get all entries for a specific day."""
-        file_path = self._get_session_file(day)
-        if not file_path.exists():
+        Returns:
+            List of session entries, most recent last
+        """
+        path = self._get_session_file(user_id)
+        if not path.exists():
             return []
 
         entries = []
-        with file_path.open("r", encoding="utf-8") as f:
+        with path.open("r", encoding="utf-8") as f:
             for line in f:
-                line = line.strip()
-                if line:
-                    data = json.loads(line)
-                    entries.append(
-                        SessionEntry(
-                            timestamp=data["timestamp"],
-                            type=data["type"],
-                            content=data["content"],
-                            metadata=data.get("metadata"),
-                        )
-                    )
-        return entries
+                if line.strip():
+                    try:
+                        entries.append(json.loads(line))
+                    except json.JSONDecodeError:
+                        continue  # Skip malformed lines
 
-    def get_recent(self, days: int = 7) -> list[SessionEntry]:
-        """Get entries from the last N days.
+        return entries[-limit:]
+
+    def get_today(self, user_id: int) -> list[dict]:
+        """Get today's session entries.
 
         Args:
-            days: Number of days to look back (default 7)
+            user_id: Telegram user ID
 
         Returns:
-            List of entries sorted by timestamp (oldest first)
+            List of today's entries
+        """
+        today = datetime.now().date().isoformat()
+        return [
+            e
+            for e in self.get_recent(user_id, limit=200)
+            if e.get("ts", "").startswith(today)
+        ]
+
+    def get_stats(self, user_id: int, days: int = 7) -> dict[str, int]:
+        """Get usage statistics for the last N days.
+
+        Args:
+            user_id: Telegram user ID
+            days: Number of days to analyze
+
+        Returns:
+            Dict with counts by entry type
         """
         from datetime import timedelta
 
-        entries = []
-        today = date.today()
+        cutoff = (datetime.now() - timedelta(days=days)).isoformat()
+        entries = self.get_recent(user_id, limit=1000)
 
-        for i in range(days):
-            day = today - timedelta(days=i)
-            entries.extend(self.get_day(day))
-
-        # Sort by timestamp (oldest first)
-        entries.sort(key=lambda e: e.timestamp)
-        return entries
-
-    def get_stats(self) -> dict[str, Any]:
-        """Get statistics about stored sessions.
-
-        Returns:
-            Dict with stats: total_entries, by_type, by_day, date_range
-        """
-        stats: dict[str, Any] = {
-            "total_entries": 0,
-            "by_type": {},
-            "by_day": {},
-            "date_range": {"first": None, "last": None},
-        }
-
-        if not self.sessions_path.exists():
-            return stats
-
-        session_files = sorted(self.sessions_path.glob("*.jsonl"))
-        if not session_files:
-            return stats
-
-        # Parse first and last dates from filenames
-        stats["date_range"]["first"] = session_files[0].stem
-        stats["date_range"]["last"] = session_files[-1].stem
-
-        for file_path in session_files:
-            day = file_path.stem
-            day_count = 0
-
-            with file_path.open("r", encoding="utf-8") as f:
-                for line in f:
-                    line = line.strip()
-                    if line:
-                        data = json.loads(line)
-                        entry_type = data.get("type", "unknown")
-
-                        stats["total_entries"] += 1
-                        day_count += 1
-                        stats["by_type"][entry_type] = (
-                            stats["by_type"].get(entry_type, 0) + 1
-                        )
-
-            stats["by_day"][day] = day_count
+        stats: dict[str, int] = {}
+        for entry in entries:
+            if entry.get("ts", "") >= cutoff:
+                entry_type = entry.get("type", "unknown")
+                stats[entry_type] = stats.get(entry_type, 0) + 1
 
         return stats

@@ -21,9 +21,11 @@ logger = logging.getLogger(__name__)
 @router.message(Command("do"))
 async def cmd_do(message: Message, command: CommandObject, state: FSMContext) -> None:
     """Handle /do command."""
+    user_id = message.from_user.id if message.from_user else 0
+
     # Check for inline text: /do move overdue tasks
     if command.args:
-        await process_request(message, command.args)
+        await process_request(message, command.args, user_id)
         return
 
     # Otherwise, wait for next message
@@ -80,10 +82,11 @@ async def handle_do_input(message: Message, bot: Bot, state: FSMContext) -> None
         await message.answer("❌ Отправь текст или голосовое сообщение")
         return
 
-    await process_request(message, prompt)
+    user_id = message.from_user.id if message.from_user else 0
+    await process_request(message, prompt, user_id)
 
 
-async def process_request(message: Message, prompt: str) -> None:
+async def process_request(message: Message, prompt: str, user_id: int = 0) -> None:
     """Process the user's request with Claude."""
     status_msg = await message.answer("⏳ Выполняю...")
 
@@ -92,7 +95,7 @@ async def process_request(message: Message, prompt: str) -> None:
 
     async def run_with_progress() -> dict:
         task = asyncio.create_task(
-            asyncio.to_thread(processor.execute_prompt, prompt)
+            asyncio.to_thread(processor.execute_prompt, prompt, user_id)
         )
 
         elapsed = 0

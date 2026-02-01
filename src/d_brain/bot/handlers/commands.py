@@ -8,6 +8,7 @@ from aiogram.types import Message
 
 from d_brain.bot.keyboards import get_main_keyboard
 from d_brain.config import get_settings
+from d_brain.services.session import SessionStore
 from d_brain.services.storage import VaultStorage
 
 router = Router(name="commands")
@@ -57,8 +58,13 @@ async def cmd_help(message: Message) -> None:
 @router.message(Command("status"))
 async def cmd_status(message: Message) -> None:
     """Handle /status command."""
+    user_id = message.from_user.id if message.from_user else 0
     settings = get_settings()
     storage = VaultStorage(settings.vault_path)
+
+    # Log command
+    session = SessionStore(settings.vault_path)
+    session.append(user_id, "command", cmd="/status")
 
     today = date.today()
     content = storage.read_daily(today)
@@ -77,6 +83,14 @@ async def cmd_status(message: Message) -> None:
 
     total = len(entries)
 
+    # Get weekly stats from session
+    week_stats = ""
+    stats = session.get_stats(user_id, days=7)
+    if stats:
+        week_stats = "\n\n<b>За 7 дней:</b>"
+        for entry_type, count in sorted(stats.items()):
+            week_stats += f"\n• {entry_type}: {count}"
+
     await message.answer(
         f"📅 <b>{today}</b>\n\n"
         f"Всего записей: <b>{total}</b>\n"
@@ -84,4 +98,5 @@ async def cmd_status(message: Message) -> None:
         f"- 💬 Текстовых: {text_count}\n"
         f"- 📷 Фото: {photo_count}\n"
         f"- ↩️ Пересланных: {forward_count}"
+        f"{week_stats}"
     )

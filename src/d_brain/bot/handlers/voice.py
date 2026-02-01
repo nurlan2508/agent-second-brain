@@ -7,6 +7,7 @@ from aiogram import Bot, Router
 from aiogram.types import Message
 
 from d_brain.config import get_settings
+from d_brain.services.session import SessionStore
 from d_brain.services.storage import VaultStorage
 from d_brain.services.transcription import DeepgramTranscriber
 
@@ -46,6 +47,16 @@ async def handle_voice(message: Message, bot: Bot) -> None:
 
         timestamp = datetime.fromtimestamp(message.date.timestamp())
         storage.append_to_daily(transcript, timestamp, "[voice]")
+
+        # Log to session
+        session = SessionStore(settings.vault_path)
+        session.append(
+            message.from_user.id,
+            "voice",
+            text=transcript,
+            duration=message.voice.duration,
+            msg_id=message.message_id,
+        )
 
         await message.answer(f"🎤 {transcript}\n\n✓ Сохранено")
         logger.info("Voice message saved: %d chars", len(transcript))
