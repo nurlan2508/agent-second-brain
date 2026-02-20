@@ -1,11 +1,11 @@
 ---
 name: second-brain-processor
-description: Personal assistant for processing daily voice/text entries from Telegram. Classifies content, creates Todoist tasks aligned with goals, saves thoughts to Obsidian with wiki-links, generates HTML reports. Triggers on /process command or daily 21:00 cron.
+description: Personal assistant for processing daily voice/text entries from Telegram. Classifies content using GTD methodology, creates tasks in Apple Reminders, saves reference material to Apple Notes, generates HTML reports. Triggers on /process command or daily 21:00 cron.
 ---
 
 # Second Brain Processor
 
-Process daily entries → tasks (Todoist) + thoughts (Obsidian) + HTML report (Telegram).
+Process daily entries → GTD classify → Apple Reminders (tasks) + Apple Notes (reference) + HTML report (Telegram).
 
 ## CRITICAL: Output Format
 
@@ -27,152 +27,121 @@ WRONG:
 CORRECT:
 <b>Title</b>
 
+---
+
 ## MCP Tools Required
 
-mcp__todoist__add-tasks — Create tasks
-mcp__todoist__find-tasks — Check duplicates
-mcp__todoist__find-tasks-by-date — Check workload
+### Apple Reminders (apple-events):
+- `mcp__apple-events__reminders_tasks` — CRUD напоминаний (action: read/create/update/delete)
+- `mcp__apple-events__reminders_lists` — CRUD списков (action: read/create/update/delete)
+- `mcp__apple-events__calendar_events` — CRUD событий Calendar (action: read/create/update/delete)
+- `mcp__apple-events__calendar_calendars` — список Calendar (action: read)
+
+### Apple Notes (apple-notes):
+- `mcp__Read_and_Write_Apple_Notes__list_notes` — список заметок в папке
+- `mcp__Read_and_Write_Apple_Notes__get_note_content` — содержимое заметки
+- `mcp__Read_and_Write_Apple_Notes__add_note` — создать заметку
+- `mcp__Read_and_Write_Apple_Notes__update_note_content` — обновить заметку
+
+---
 
 ## CRITICAL: MCP Tool Usage
 
 **СНАЧАЛА ВЫЗОВИ TOOL. ПОТОМ ДУМАЙ.**
 
-У тебя ЕСТЬ доступ к MCP tools:
-- `mcp__todoist__add-tasks`
-- `mcp__todoist__find-tasks`
-- `mcp__todoist__find-tasks-by-date`
-- `mcp__todoist__complete-tasks`
-- `mcp__todoist__update-tasks`
-
 ### Обязательный алгоритм:
 
-1. ВЫЗОВИ: mcp__todoist__find-tasks-by-date
-   ↓
-   Получил результат? → Продолжай
-   ↓
-   Ошибка? → Читай файлы 30 секунд, потом ВЫЗОВИ СНОВА
-   ↓
-   3 ошибки подряд? → Покажи ТОЧНЫЙ текст ошибки
+1. ВЫЗОВИ: `mcp__apple-events__reminders_lists` action:read
+   ↓ Получил списки? → Продолжай
+   ↓ Ошибка? → Читай файлы 30 секунд, потом ВЫЗОВИ СНОВА
+   ↓ 3 ошибки подряд? → Покажи ТОЧНЫЙ текст ошибки
 
 ### ЗАПРЕЩЕНО:
 - ❌ Писать "MCP недоступен"
 - ❌ Предлагать "добавь вручную"
 - ❌ Использовать subprocess для вызова CLI
 - ❌ Делать HTTP запросы к API напрямую
-- ❌ Выводить команды для копирования
 - ❌ Решать что не работает БЕЗ вызова tool
 
 ### ОБЯЗАТЕЛЬНО:
 - ✅ Вызывать MCP tool напрямую
 - ✅ Если ошибка — подождать, вызвать снова
 - ✅ 3 retry перед любыми выводами
-- ✅ Если task создан — включить task ID в отчёт
+- ✅ Если task создан — включить название списка в отчёт
 
 При ошибке MCP tool — показать ТОЧНУЮ ошибку от tool, не придумывать отговорки.
 
+---
+
 ## Processing Flow
 
-1. Load context — Read goals/3-weekly.md (ONE Big Thing), goals/2-monthly.md
-2. Check workload — find-tasks-by-date for 7 days
-3. **Check process goals** — find-tasks with labels: ["process-goal"]
-4. Read daily — daily/YYYY-MM-DD.md
-5. Process entries — Classify → task or thought
-6. Build links — Connect notes with [[wiki-links]]
-7. **Log actions to daily** — append action log entry
-8. **Evolve MEMORY.md** — update long-term memory if needed
-9. Generate HTML report — RAW HTML for Telegram
+1. **Verify MCP** — вызови `reminders_lists` action:read (убедись что MCP работает)
+2. **Read context** — goals/3-weekly.md (ONE Big Thing), goals/2-monthly.md
+3. **Check overdue** — `reminders_tasks` action:read dueWithin:today (что просрочено?)
+4. **Read daily** — daily/YYYY-MM-DD.md
+5. **GTD Clarify** — для каждого entry применить GTD decision tree (см. references/classification.md)
+6. **GTD Organize** — роутинг в нужное место:
+   - Next Action → `reminders_tasks` action:create (нужный список + dueDate)
+   - Project → `reminders_tasks` create + `add_note` в "Проекты рабочие"
+   - Waiting For → `reminders_tasks` create в "Отложенные"
+   - Someday/Maybe → `reminders_tasks` create в "Когда-нибудь/ может быть"
+   - Calendar event → `calendar_events` action:create
+   - Reference → `add_note` в нужную папку Notes
+   - Trash → зачеркнуть ~~текст~~ в daily
+7. **Log to daily** — записать что создано/обработано
+8. **Evolve MEMORY.md** — обновить если есть важные изменения
+9. **Generate HTML report** — RAW HTML для Telegram
 
-## Process Goals Check (Step 3)
+---
 
-**ОБЯЗАТЕЛЬНО выполни при каждом /process:**
+## GTD Decision Tree
 
-### 1. Проверь существующие process goals
-Используй mcp__todoist__find-tasks с labels: ["process-goal"]
-
-### 2. Если отсутствуют — создай
-Читай goals/ и генерируй process commitments:
-
-| Goal Level | Source | Process Pattern |
-|------------|--------|-----------------|
-| Weekly ONE Big Thing | goals/3-weekly.md | 2h deep work ежедневно |
-| Monthly Top 3 | goals/2-monthly.md | 1 action/день на приоритет |
-| Yearly Focus | goals/1-yearly-*.md | 30 мин/день на стратегию |
-
-Создавай recurring tasks с label "process-goal" (max 5-7 активных).
-
-### 3. Включи в отчёт
-
-```html
-<b>📋 Process Goals:</b>
-• 2h deep work → ✅ активен
-• 1 outreach/день → ⚠️ просрочен
-{N} активных | {M} требуют внимания
+```
+Entry → Actionable?
+├─ NO → Useful?
+│       ├─ YES → Reference → Apple Notes (папка по теме)
+│       └─ NO → Trash (~~зачеркнуть~~)
+│
+└─ YES → Delegate?
+         ├─ YES → Waiting For → Reminders "Отложенные"
+         └─ NO → < 2 min?
+                  ├─ YES → Do Now (отметить в отчёте)
+                  └─ NO → Single/Multi step?
+                          ├─ SINGLE → Next Action → Reminders (нужный список)
+                          └─ MULTI → Project → Reminders + Notes
 ```
 
-See: references/process-goals.md for patterns and examples.
+See references/classification.md for full decision tree and list mapping.
+
+---
 
 ## Logging to daily/ (Step 7)
 
-**После ЛЮБЫХ изменений в vault — СРАЗУ пиши в `daily/YYYY-MM-DD.md`:**
+**После ЛЮБЫХ изменений — СРАЗУ пиши в `daily/YYYY-MM-DD.md`:**
 
 Format:
 ```
 ## HH:MM [text]
-{Description of actions}
-
-**Created/Updated:**
-- [[path/to/file|Name]] — description
-```
-
-What to log:
-- Files created in thoughts/
-- Tasks created in Todoist (with task ID)
-- Links built between notes
-
-Example:
-```
-## 14:30 [text]
 Daily processing complete
 
-**Created tasks:** 3
-- "Follow-up client" (id: 8501234567, p2, tomorrow)
-- "Prepare proposal" (id: 8501234568, p2, friday)
+**Reminders created:** N
+- "Название" → [Список]
 
-**Saved thoughts:** 1
-- [[thoughts/ideas/product-launch|Product Launch]] — new idea
+**Notes saved:** M
+- "Название" → [Папка]
 ```
+
+---
 
 ## Evolve MEMORY.md (Step 8)
 
-**GOAL:** Keep MEMORY.md current. Don't append — EVOLVE.
+When to update:
+- ✅ Key decisions, new patterns, changes in Active Context
+- ❌ Daily trivia, temporary notes
 
-### When to update:
-- ✅ Key decisions with impact (pivot, tool choice, architecture change)
-- ✅ New patterns/insights (learnings)
-- ✅ Changes in Active Context (new ONE Big Thing, Hot Projects)
+How: REPLACE old info, don't append.
 
-### When NOT to update:
-- ❌ Daily trivia (meetings, calls without impact)
-- ❌ Temporary notes (stay in daily/)
-- ❌ Duplicates of what's already there
-
-### How to update (evolve, not append):
-
-| Situation | Action |
-|-----------|--------|
-| New contradicts old | REPLACE old information |
-| New complements old | Add to existing section |
-| Info is outdated | Delete or archive |
-
-Use Edit tool for precise changes.
-
-### In report (if updated):
-
-```html
-<b>🧠 MEMORY.md updated:</b>
-• Active Context → Hot Projects changed
-• Key Decisions → +1 new decision
-```
+---
 
 ## Entry Format
 
@@ -181,24 +150,7 @@ Content
 
 Types: [voice], [text], [forward from: Name], [photo]
 
-## Classification
-
-task → Todoist (see references/todoist.md)
-idea/reflection/learning → thoughts/ (see references/classification.md)
-
-## Priority Rules
-
-p1 — Client deadline, urgent
-p2 — Aligns with ONE Big Thing or monthly priority
-p3 — Aligns with yearly goal
-p4 — Operational, no goal alignment
-
-## Thought Categories
-
-💡 idea → thoughts/ideas/
-🪞 reflection → thoughts/reflections/
-🎯 project → thoughts/projects/
-📚 learning → thoughts/learnings/
+---
 
 ## HTML Report Template
 
@@ -209,61 +161,39 @@ Output RAW HTML (no markdown, no code blocks):
 <b>🎯 Текущий фокус:</b>
 {ONE_BIG_THING}
 
-<b>📓 Сохранено мыслей:</b> {N}
-• {emoji} {title} → {category}/
-
 <b>✅ Создано задач:</b> {M}
-• {task} <i>({priority}, {due})</i>
+• {task} → <i>{список}</i>
 
-<b>📋 Process Goals:</b>
-• {process goal 1} → {status}
-• {process goal 2} → {status}
-{N} активных | {M} требуют внимания
+<b>📓 Сохранено в Notes:</b> {N}
+• {название} → <i>{папка}/</i>
 
-<b>📅 Загрузка на неделю:</b>
-Пн: {n} | Вт: {n} | Ср: {n} | Чт: {n} | Пт: {n} | Сб: {n} | Вс: {n}
+<b>📅 Просроченные задачи:</b>
+• {overdue count} просрочено | {today count} на сегодня
 
 <b>⚠️ Требует внимания:</b>
-• {overdue or stale goals}
+• {items needing attention}
 
-<b>🔗 Новые связи:</b>
-• [[Note A]] ↔ [[Note B]]
-
-<b>⚡ Топ-3 приоритета:</b>
-1. {task}
-2. {task}
-3. {task}
-
-<b>📈 Прогресс:</b>
-• {goal}: {%} {emoji}
-
-<b>🧠 MEMORY.md:</b>
-• {section} → {change description}
-<i>(if updated)</i>
+<b>⚡ Топ-3 приоритета сейчас:</b>
+1. {task} → {список}
+2. {task} → {список}
+3. {task} → {список}
 
 ---
 <i>Обработано за {duration}</i>
 
+---
+
 ## If Already Processed
 
-If all entries have `<!-- ✓ processed -->` marker, return status report:
+If all entries have `<!-- ✓ processed -->` marker:
 
 📊 <b>Статус за {DATE}</b>
 
 <b>🎯 Текущий фокус:</b>
 {ONE_BIG_THING}
 
-<b>📋 Process Goals:</b>
-• {process goal 1} → {status}
-• {process goal 2} → {status}
-{N} активных | {M} требуют внимания
-
-<b>📅 Загрузка на неделю:</b>
-Пн: {n} | Вт: {n} | Ср: {n} | Чт: {n} | Пт: {n} | Сб: {n} | Вс: {n}
-
-<b>⚠️ Требует внимания:</b>
-• {overdue count} просроченных
-• {today count} на сегодня
+<b>📅 Просроченные задачи:</b>
+• {overdue count} просрочено | {today count} на сегодня
 
 <b>⚡ Топ-3 приоритета:</b>
 1. {task}
@@ -272,6 +202,8 @@ If all entries have `<!-- ✓ processed -->` marker, return status report:
 
 ---
 <i>Записи уже обработаны ранее</i>
+
+---
 
 ## Allowed HTML Tags
 
@@ -291,14 +223,12 @@ NO unsupported tags: div, span, br, p, table
 
 Max length: 4096 characters.
 
+---
+
 ## References
 
 Read these files as needed:
-- references/about.md — User profile, decision filters
-- references/classification.md — Entry classification rules
-- references/todoist.md — Task creation details
-- references/goals.md — Goal alignment logic
-- references/process-goals.md — Process vs outcome goals, transformation patterns
-- references/links.md — Wiki-links building
-- references/rules.md — Mandatory processing rules
-- references/report-template.md — Full HTML report spec
+- references/about.md — User profile
+- references/classification.md — GTD decision tree + list mapping
+- references/apple-reminders.md — Apple Reminders MCP tools + date format
+- references/apple-notes.md — Apple Notes MCP tools + folder mapping
