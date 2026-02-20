@@ -9,7 +9,7 @@ from aiogram.types import Message
 from d_brain.config import get_settings
 from d_brain.services.session import SessionStore
 from d_brain.services.storage import VaultStorage
-from d_brain.services.transcription import DeepgramTranscriber
+from d_brain.services.transcription import WhisperTranscriber
 
 router = Router(name="voice")
 logger = logging.getLogger(__name__)
@@ -25,7 +25,7 @@ async def handle_voice(message: Message, bot: Bot) -> None:
 
     settings = get_settings()
     storage = VaultStorage(settings.vault_path)
-    transcriber = DeepgramTranscriber(settings.deepgram_api_key)
+    transcriber = WhisperTranscriber(settings.openai_api_key)
 
     try:
         file = await bot.get_file(message.voice.file_id)
