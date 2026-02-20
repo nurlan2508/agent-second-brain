@@ -91,7 +91,7 @@ async def process_request(message: Message, prompt: str, user_id: int = 0) -> No
     status_msg = await message.answer("⏳ Выполняю...")
 
     settings = get_settings()
-    processor = ClaudeProcessor(settings.vault_path, settings.todoist_api_key)
+    processor = ClaudeProcessor(settings.vault_path)
 
     async def run_with_progress() -> dict:
         task = asyncio.create_task(

@@ -1,9 +1,12 @@
 {
   "mcpServers": {
-    "todoist": {
-      "type": "stdio",
-      "command": "npx",
-      "args": ["-y", "@doist/todoist-ai"]
+    "apple-events": {
+      "command": "node",
+      "args": ["/opt/homebrew/lib/node_modules/mcp-server-apple-events/bin/run.cjs"]
+    },
+    "apple-notes": {
+      "command": "bunx",
+      "args": ["mcp-apple-notes"]
     }
   }
 }

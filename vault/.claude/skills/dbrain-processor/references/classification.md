@@ -1,193 +1,121 @@
-# Entry Classification
+# GTD Entry Classification
 
-<!--
-╔══════════════════════════════════════════════════════════════════╗
-║  КАК НАСТРОИТЬ ЭТОТ ФАЙЛ                                         ║
-╠══════════════════════════════════════════════════════════════════╣
-║  1. Замените [Your Client Names] на имена ваших клиентов        ║
-║  2. Замените [Your Company] на название вашей компании          ║
-║  3. Замените [@your_channel] на ваш Telegram-канал              ║
-║  4. Добавьте свои домены работы, если они отличаются            ║
-║  5. Удалите этот комментарий после настройки                    ║
-╚══════════════════════════════════════════════════════════════════╝
--->
+## GTD Decision Tree
 
-## Work Domains → Categories
-
-Based on user's work context (see [ABOUT.md](ABOUT.md)):
-
-### Client Work
-Брифы, стратегии, креатив, кампании, KPI, предложения
-
-<!-- Добавьте имена ваших клиентов через запятую -->
-**Keywords:** [Your Client Names], клиент, бриф, презентация, дедлайн, KPI
-
-**→ Category:** task (p1-p2) → Todoist
-
-### AI & Tech
-Инструменты, модели, промпты, пайплайны, агенты
-
-**Keywords:** GPT, Claude, модель, агент, API, пайплайн, автоматизация, интеграция
-
-**→ Category:** learning или project → thoughts/
-
-### Product
-Идеи, гипотезы, MVP, юнит-экономика
-
-**Keywords:** продукт, SaaS, MVP, гипотеза, монетизация, юнит-экономика, стартап
-
-**→ Category:** idea или project → thoughts/
-
-### Company Ops
-Команда, процессы, автоматизация, найм, управление, финансы
-
-<!-- Замените [Your Company] на название вашей компании/проекта -->
-**Keywords:** команда, найм, процесс, HR, финансы, [Your Company]
-
-**→ Category:** task или project (depends on urgency)
-
-### Content
-Посты, идеи, тезисы для Telegram и LinkedIn
-
-<!-- Замените [@your_channel] на ваш Telegram-канал или удалите если не нужно -->
-**Keywords:** пост, [@your_channel], LinkedIn, контент, тезис, статья
-
-**→ Category:** idea → thoughts/ideas/ или task если с дедлайном
+```
+Entry text → Is it actionable?
+│
+├─ NO → Is it potentially useful?
+│       ├─ YES → REFERENCE → Apple Notes (нужная папка)
+│       └─ NO → TRASH (зачеркнуть ~~текст~~ в daily)
+│
+└─ YES → Can I delegate it?
+         ├─ YES → WAITING FOR
+         │         → Apple Reminders "Отложенные"
+         │         → title: "Жду: [что] от [кого]"
+         │
+         └─ NO → < 2 minutes?
+                  ├─ YES → DO NOW → выполнить + отметить в отчёте
+                  └─ NO → Single step or multi-step?
+                          │
+                          ├─ SINGLE NEXT ACTION
+                          │   → Apple Reminders (нужный список)
+                          │   + dueDate если есть
+                          │
+                          └─ PROJECT (≥2 steps)
+                              → Apple Reminders (контекстный список)
+                              → Apple Notes "Проекты рабочие" (outcome + steps)
+                              → Первый next action → Reminders
+```
 
 ---
 
-## Decision Tree
+## Контексты → Списки Reminders
 
-```
-Entry text contains...
-│
-├─ Client brand or deadline? ────────────────────> TASK (p1-p2)
-│  ([Your Clients], клиент, дедлайн, презентация)
-│
-├─ Operational/urgent? ──────────────────────────> TASK (p2-p3)
-│  (нужно сделать, не забыть, позвонить, встреча)
-│
-├─ AI/tech learning? ────────────────────────────> LEARNING
-│  (узнал, модель, агент, интеграция)
-│
-├─ Product/SaaS idea? ───────────────────────────> IDEA или PROJECT
-│  (продукт, MVP, гипотеза, SaaS)
-│
-├─ Strategic thinking? ──────────────────────────> PROJECT
-│  (стратегия, план, R&D, долгосрочно)
-│
-├─ Personal insight? ────────────────────────────> REFLECTION
-│  (понял, осознал, философия)
-│
-└─ Content idea? ────────────────────────────────> IDEA
-   (пост, тезис, контент)
-```
+| Контекст | Список | Когда использовать |
+|----------|--------|--------------------|
+| @urgent | Срочные | Клиентские дедлайны, критичное сегодня |
+| @waiting | Отложенные | Жду ответа/действия от кого-то |
+| @personal | Личные проекты | Личные дела, саморазвитие |
+| @health | Здоровье | Здоровье, врачи, спорт |
+| @family | Family | Семейные дела |
+| @errands | Список покупок | Покупки, поручения |
+| @learning | Обучение | Курсы, книги, навыки |
+| @money | Кредиты | Финансовые платежи, долги |
+| @fund | Фонд | Задачи по фонду |
+| @ai | монетизация AI | AI-проекты, автоматизация |
+| @comms | Коммуникация 2.0 | Навыки общения, нетворкинг |
+| @someday | Когда-нибудь/ может быть | Идеи на потом, мечты |
+| @inbox | inbox | Непонятное — разобрать позже |
 
-## Apply Decision Filters
+---
 
-Перед сохранением спроси:
-- Это масштабируется?
-- Это можно автоматизировать?
-- Это усиливает экспертизу или бренд?
-- Это приближает к продукту или SaaS?
+## Someday/Maybe маркеры
 
-Если да на 2+ вопроса → повысить приоритет.
+Если в тексте есть: "когда-нибудь", "хорошо бы", "мечта", "может быть",
+"в будущем", "было бы круто", "хочу но не срочно" → список **Когда-нибудь/ может быть**
+
+---
+
+## Waiting For маркеры
+
+Если в тексте есть: "жду ответа", "отправил", "делегировал", "ждать от",
+"должны ответить", "ждём решения" → список **Отложенные**
+
+---
+
+## Reference → Apple Notes (папки)
+
+| Тип контента | Папка Notes |
+|-------------|-------------|
+| Описание проекта, outcome, план | Проекты рабочие |
+| AI-инструменты, промпты, модели | AI |
+| Заметки по продуктивности | Продуктивность |
+| Личное развитие, книги, инсайты | Личностный рост |
+| Планы, цели, видение | Планирование |
+| Фонд, некоммерческие | Фонд |
+| YouTube, контент | Канал YouTube |
+| Медицина, здоровье | Здоровье |
+| GTD-материалы | GTD |
+
+---
+
+## Calendar Events
+
+Если есть конкретное время (встреча, звонок, дедлайн с часом):
+→ `calendar_events` action: create
 
 ---
 
 ## Photo Entries
 
-For `[photo]` entries:
-
-1. Analyze image content via vision
-2. Determine domain:
-   - Screenshot клиентского материала → Client Work
-   - Схема/диаграмма → AI & Tech или Product
-   - Текст/статья → Learning
-3. Add description to daily file
+1. Анализировать содержимое через vision
+2. Определить домен:
+   - Скрин задачи/дедлайна → task → Reminders
+   - Схема/план → Reference → Notes
+   - Текст для изучения → learning → Notes
+3. Добавить описание в daily файл
 
 ---
 
 ## Output Locations
 
-| Category | Destination | Priority |
-|----------|-------------|----------|
-| task (client) | Todoist | p1-p2 |
-| task (ops) | Todoist | p2-p3 |
-| task (content) | Todoist | p3-p4 |
-| idea | thoughts/ideas/ | — |
-| reflection | thoughts/reflections/ | — |
-| project | thoughts/projects/ | — |
-| learning | thoughts/learnings/ | — |
-
----
-
-## File Naming
-
-```
-thoughts/{category}/{YYYY-MM-DD}-short-title.md
-```
-
-Examples:
-```
-thoughts/ideas/2024-12-16-saas-pricing-model.md
-thoughts/projects/2024-12-16-ai-agents-pipeline.md
-thoughts/learnings/2024-12-16-claude-mcp-setup.md
-```
-
----
-
-## Thought Structure
-
-Use preferred format:
-
-```markdown
----
-date: {YYYY-MM-DD}
-type: {category}
-domain: {Client Work|AI & Tech|Product|Agency Ops|Content}
-tags: [tag1, tag2]
----
-
-## Context
-[Что привело к мысли]
-
-## Insight
-[Ключевая идея]
-
-## Implication
-<!-- Замените [Your Company] на название вашей компании -->
-[Что это значит для [Your Company]/продукта/стратегии]
-
-## Next Action
-[Конкретный шаг — не абстрактный]
-```
+| GTD Категория | Destination |
+|---------------|-------------|
+| Next Action | Apple Reminders (контекстный список) |
+| Project | Apple Reminders (список) + Apple Notes (описание) |
+| Waiting For | Apple Reminders "Отложенные" |
+| Someday/Maybe | Apple Reminders "Когда-нибудь/ может быть" |
+| Calendar | Apple Calendar (calendar_events) |
+| Reference | Apple Notes (нужная папка) |
+| Trash | ~~зачёркнуто~~ в daily |
 
 ---
 
 ## Anti-Patterns (ИЗБЕГАТЬ)
 
-При создании мыслей НЕ делать:
-- Абстрактные рассуждения без Next Action
-- Академическая теория без применения к вашему проекту/продукту
-- Повторы без синтеза (кластеризуй похожие!)
-- Хаотичные списки без приоритетов
-- Задачи типа "подумать о..." (конкретизируй!)
-
----
-
-## MOC Updates
-
-After creating thought file, add link to:
-```
-MOC/MOC-{category}s.md
-```
-
-Group by domain when relevant:
-```markdown
-## AI & Tech
-- [[2024-12-16-claude-mcp-setup]] - MCP integration
-
-## Product
-- [[2024-12-16-saas-pricing-model]] - Pricing research
-```
+- ❌ "Подумать о..." → конкретизируй действие
+- ❌ "Разобраться с..." → что именно сделать?
+- ❌ Абстрактные задачи без Next Action
+- ❌ Дубликаты (сначала проверь через search)
+- ❌ Задачи без контекста/списка
