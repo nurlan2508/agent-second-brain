@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     )
 
     telegram_bot_token: str = Field(description="Telegram Bot API token")
-    deepgram_api_key: str = Field(description="Deepgram API key for transcription")
+    openai_api_key: str = Field(description="OpenAI API key for Whisper transcription")
     vault_path: Path = Field(
         default=Path("./vault"),
         description="Path to vault directory",
