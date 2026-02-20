@@ -25,7 +25,7 @@ async def cmd_weekly(message: Message) -> None:
     status_msg = await message.answer("⏳ Генерирую недельный дайджест...")
 
     settings = get_settings()
-    processor = ClaudeProcessor(settings.vault_path, settings.todoist_api_key)
+    processor = ClaudeProcessor(settings.vault_path)
     git = VaultGit(settings.vault_path)
 
     async def run_with_progress() -> dict:

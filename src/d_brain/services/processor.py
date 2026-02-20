@@ -17,9 +17,8 @@ DEFAULT_TIMEOUT = 1200  # 20 minutes
 class ClaudeProcessor:
     """Service for triggering Claude Code processing."""
 
-    def __init__(self, vault_path: Path, todoist_api_key: str = "") -> None:
+    def __init__(self, vault_path: Path) -> None:
         self.vault_path = Path(vault_path)
-        self.todoist_api_key = todoist_api_key
         self._mcp_config_path = (self.vault_path.parent / "mcp-config.json").resolve()
 
     def _load_skill_content(self) -> str:
@@ -33,9 +32,16 @@ class ClaudeProcessor:
             return skill_path.read_text()
         return ""
 
-    def _load_todoist_reference(self) -> str:
-        """Load Todoist reference for inclusion in prompt."""
-        ref_path = self.vault_path / ".claude/skills/dbrain-processor/references/todoist.md"
+    def _load_apple_reminders_reference(self) -> str:
+        """Load Apple Reminders reference for inclusion in prompt."""
+        ref_path = self.vault_path / ".claude/skills/dbrain-processor/references/apple-reminders.md"
+        if ref_path.exists():
+            return ref_path.read_text()
+        return ""
+
+    def _load_apple_notes_reference(self) -> str:
+        """Load Apple Notes reference for inclusion in prompt."""
+        ref_path = self.vault_path / ".claude/skills/dbrain-processor/references/apple-notes.md"
         if ref_path.exists():
             return ref_path.read_text()
         return ""
@@ -68,36 +74,27 @@ class ClaudeProcessor:
         return "\n".join(lines)
 
     def _html_to_markdown(self, html: str) -> str:
-        """Convert Telegram HTML to Obsidian Markdown."""
+        """Convert Telegram HTML to Markdown."""
         import re
 
         text = html
-        # <b>text</b> → **text**
         text = re.sub(r"<b>(.*?)</b>", r"**\1**", text)
-        # <i>text</i> → *text*
         text = re.sub(r"<i>(.*?)</i>", r"*\1*", text)
-        # <code>text</code> → `text`
         text = re.sub(r"<code>(.*?)</code>", r"`\1`", text)
-        # <s>text</s> → ~~text~~
         text = re.sub(r"<s>(.*?)</s>", r"~~\1~~", text)
-        # Remove <u> (no Markdown equivalent, just keep text)
         text = re.sub(r"</?u>", "", text)
-        # <a href="url">text</a> → [text](url)
         text = re.sub(r'<a href="([^"]+)">([^<]+)</a>', r"[\2](\1)", text)
 
         return text
 
     def _save_weekly_summary(self, report_html: str, week_date: date) -> Path:
         """Save weekly summary to vault/summaries/YYYY-WXX-summary.md."""
-        # Calculate ISO week number
         year, week, _ = week_date.isocalendar()
         filename = f"{year}-W{week:02d}-summary.md"
         summary_path = self.vault_path / "summaries" / filename
 
-        # Convert HTML to Markdown for Obsidian
         content = self._html_to_markdown(report_html)
 
-        # Add frontmatter
         frontmatter = f"""---
 date: {week_date.isoformat()}
 type: weekly-summary
@@ -115,7 +112,6 @@ week: {year}-W{week:02d}
         if moc_path.exists():
             content = moc_path.read_text()
             link = f"- [[summaries/{summary_path.name}|{summary_path.stem}]]"
-            # Insert after "## Previous Weeks" if not already there
             if summary_path.stem not in content:
                 content = content.replace(
                     "## Previous Weeks\n",
@@ -145,21 +141,21 @@ week: {year}-W{week:02d}
                 "processed_entries": 0,
             }
 
-        # Load skill content directly (@ references don't work in --print mode)
         skill_content = self._load_skill_content()
 
-        prompt = f"""Сегодня {day}. Выполни ежедневную обработку.
+        prompt = f"""Сегодня {day}. Выполни ежедневную GTD-обработку.
 
 === SKILL INSTRUCTIONS ===
 {skill_content}
 === END SKILL ===
 
-ПЕРВЫМ ДЕЛОМ: вызови mcp__todoist__user-info чтобы убедиться что MCP работает.
+ПЕРВЫМ ДЕЛОМ: вызови mcp__apple-events__reminders_lists с action:read чтобы убедиться что MCP работает.
 
 CRITICAL MCP RULE:
-- ТЫ ИМЕЕШЬ ДОСТУП к mcp__todoist__* tools — ВЫЗЫВАЙ ИХ НАПРЯМУЮ
+- ТЫ ИМЕЕШЬ ДОСТУП к mcp__apple-events__* и mcp__Read_and_Write_Apple_Notes__* tools — ВЫЗЫВАЙ ИХ НАПРЯМУЮ
 - НИКОГДА не пиши "MCP недоступен" или "добавь вручную"
-- Для задач: вызови mcp__todoist__add-tasks tool
+- Для задач: вызови mcp__apple-events__reminders_tasks action:create
+- Для заметок: вызови mcp__Read_and_Write_Apple_Notes__add_note
 - Если tool вернул ошибку — покажи ТОЧНУЮ ошибку в отчёте
 
 CRITICAL OUTPUT FORMAT:
@@ -170,10 +166,7 @@ CRITICAL OUTPUT FORMAT:
 - If entries already processed, return status report in same HTML format"""
 
         try:
-            # Pass TODOIST_API_KEY to Claude subprocess
             env = os.environ.copy()
-            if self.todoist_api_key:
-                env["TODOIST_API_KEY"] = self.todoist_api_key
 
             result = subprocess.run(
                 [
@@ -200,11 +193,10 @@ CRITICAL OUTPUT FORMAT:
                     "processed_entries": 0,
                 }
 
-            # Return human-readable output
             output = result.stdout.strip()
             return {
                 "report": output,
-                "processed_entries": 1,  # успешно обработано
+                "processed_entries": 1,
             }
 
         except subprocess.TimeoutExpired:
@@ -238,24 +230,28 @@ CRITICAL OUTPUT FORMAT:
         """
         today = date.today()
 
-        # Load context
-        todoist_ref = self._load_todoist_reference()
+        reminders_ref = self._load_apple_reminders_reference()
+        notes_ref = self._load_apple_notes_reference()
         session_context = self._get_session_context(user_id)
 
-        prompt = f"""Ты - персональный ассистент d-brain.
+        prompt = f"""Ты - персональный ассистент d-brain. Используешь GTD-методологию.
 
 CONTEXT:
 - Текущая дата: {today}
 - Vault path: {self.vault_path}
 
-{session_context}=== TODOIST REFERENCE ===
-{todoist_ref}
+{session_context}=== APPLE REMINDERS REFERENCE ===
+{reminders_ref}
 === END REFERENCE ===
 
-ПЕРВЫМ ДЕЛОМ: вызови mcp__todoist__user-info чтобы убедиться что MCP работает.
+=== APPLE NOTES REFERENCE ===
+{notes_ref}
+=== END REFERENCE ===
+
+ПЕРВЫМ ДЕЛОМ: вызови mcp__apple-events__reminders_lists action:read чтобы убедиться что MCP работает.
 
 CRITICAL MCP RULE:
-- ТЫ ИМЕЕШЬ ДОСТУП к mcp__todoist__* tools — ВЫЗЫВАЙ ИХ НАПРЯМУЮ
+- ТЫ ИМЕЕШЬ ДОСТУП к mcp__apple-events__* и mcp__Read_and_Write_Apple_Notes__* tools — ВЫЗЫВАЙ ИХ НАПРЯМУЮ
 - НИКОГДА не пиши "MCP недоступен" или "добавь вручную"
 - Если tool вернул ошибку — покажи ТОЧНУЮ ошибку в отчёте
 
@@ -271,13 +267,11 @@ CRITICAL OUTPUT FORMAT:
 
 EXECUTION:
 1. Analyze the request
-2. Call MCP tools directly (mcp__todoist__*, read/write files)
+2. Call MCP tools directly (mcp__apple-events__*, mcp__Read_and_Write_Apple_Notes__*, read/write files)
 3. Return HTML status report with results"""
 
         try:
             env = os.environ.copy()
-            if self.todoist_api_key:
-                env["TODOIST_API_KEY"] = self.todoist_api_key
 
             result = subprocess.run(
                 [
@@ -320,40 +314,52 @@ EXECUTION:
             return {"error": str(e), "processed_entries": 0}
 
     def generate_weekly(self) -> dict[str, Any]:
-        """Generate weekly digest with Claude.
+        """Generate GTD weekly review with Claude.
 
         Returns:
-            Weekly digest report as dict
+            Weekly review report as dict
         """
         today = date.today()
 
-        prompt = f"""Сегодня {today}. Сгенерируй недельный дайджест.
+        prompt = f"""Сегодня {today}. Проведи GTD Weekly Review.
 
-ПЕРВЫМ ДЕЛОМ: вызови mcp__todoist__user-info чтобы убедиться что MCP работает.
+ПЕРВЫМ ДЕЛОМ: вызови mcp__apple-events__reminders_lists action:read чтобы убедиться что MCP работает.
 
 CRITICAL MCP RULE:
-- ТЫ ИМЕЕШЬ ДОСТУП к mcp__todoist__* tools — ВЫЗЫВАЙ ИХ НАПРЯМУЮ
-- НИКОГДА не пиши "MCP недоступен" или "добавь вручную"
-- Для выполненных задач: вызови mcp__todoist__find-completed-tasks tool
+- ТЫ ИМЕЕШЬ ДОСТУП к mcp__apple-events__* и mcp__Read_and_Write_Apple_Notes__* tools
+- НИКОГДА не пиши "MCP недоступен"
 - Если tool вернул ошибку — покажи ТОЧНУЮ ошибку в отчёте
 
-WORKFLOW:
-1. Собери данные за неделю (daily файлы в vault/daily/, completed tasks через MCP)
-2. Проанализируй прогресс по целям (goals/3-weekly.md)
-3. Определи победы и вызовы
-4. Сгенерируй HTML отчёт
+GTD WEEKLY REVIEW WORKFLOW:
+
+GET CLEAR:
+1. Проверь "inbox" в Reminders — есть ли необработанные?
+   mcp__apple-events__reminders_tasks action:read filterList:inbox
+2. Проверь daily файлы за неделю (vault/daily/) — все обработаны?
+
+GET CURRENT:
+3. Просроченные задачи — что пропущено?
+   mcp__apple-events__reminders_tasks action:read dueWithin:today showCompleted:false
+4. "Отложенные" — нужен follow-up от кого-то?
+   mcp__apple-events__reminders_tasks action:read filterList:Отложенные
+5. "Когда-нибудь/ может быть" — есть что активировать?
+   mcp__apple-events__reminders_tasks action:read filterList:Когда-нибудь/ может быть
+6. "Проекты рабочие" в Notes — прогресс? следующее действие?
+   mcp__Read_and_Write_Apple_Notes__list_notes folder:Проекты рабочие
+
+GET CREATIVE:
+7. Проверь цели (goals/3-weekly.md, goals/2-monthly.md)
+8. Что нужно добавить/изменить на следующую неделю?
 
 CRITICAL OUTPUT FORMAT:
 - Return ONLY raw HTML for Telegram (parse_mode=HTML)
 - NO markdown: no **, no ##, no ```, no tables
-- Start with 📅 <b>Недельный дайджест</b>
+- Start with 📅 <b>GTD Weekly Review</b>
 - Allowed tags: <b>, <i>, <code>, <s>, <u>
 - Be concise - Telegram has 4096 char limit"""
 
         try:
             env = os.environ.copy()
-            if self.todoist_api_key:
-                env["TODOIST_API_KEY"] = self.todoist_api_key
 
             result = subprocess.run(
                 [
@@ -374,15 +380,14 @@ CRITICAL OUTPUT FORMAT:
             )
 
             if result.returncode != 0:
-                logger.error("Weekly digest failed: %s", result.stderr)
+                logger.error("Weekly review failed: %s", result.stderr)
                 return {
-                    "error": result.stderr or "Weekly digest failed",
+                    "error": result.stderr or "Weekly review failed",
                     "processed_entries": 0,
                 }
 
             output = result.stdout.strip()
 
-            # Save to summaries/ and update MOC
             try:
                 summary_path = self._save_weekly_summary(output, today)
                 self._update_weekly_moc(summary_path)
@@ -395,11 +400,11 @@ CRITICAL OUTPUT FORMAT:
             }
 
         except subprocess.TimeoutExpired:
-            logger.error("Weekly digest timed out")
-            return {"error": "Weekly digest timed out", "processed_entries": 0}
+            logger.error("Weekly review timed out")
+            return {"error": "Weekly review timed out", "processed_entries": 0}
         except FileNotFoundError:
             logger.error("Claude CLI not found")
             return {"error": "Claude CLI not installed", "processed_entries": 0}
         except Exception as e:
-            logger.exception("Unexpected error during weekly digest")
+            logger.exception("Unexpected error during weekly review")
             return {"error": str(e), "processed_entries": 0}

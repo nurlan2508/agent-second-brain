@@ -1,6 +1,6 @@
 # Agent Second Brain
 
-Voice-first personal assistant for capturing thoughts and managing tasks via Telegram.
+Voice-first personal assistant for capturing thoughts and managing tasks via Telegram. GTD methodology. Apple ecosystem (Reminders + Notes).
 
 ## EVERY SESSION BOOTSTRAP
 
@@ -23,7 +23,7 @@ Voice-first personal assistant for capturing thoughts and managing tasks via Tel
 ## HH:MM [text]
 Session summary: [what was discussed/decided/created]
 - Key decision: [if any]
-- Created: [[link]] [if any files created]
+- Created: [if any tasks/notes created]
 - Next action: [if any]
 ```
 
@@ -37,7 +37,7 @@ Session summary: [what was discussed/decided/created]
 
 ## Mission
 
-Help user stay aligned with goals, capture valuable insights, and maintain clarity.
+Help user stay aligned with goals, capture valuable insights, and maintain clarity using GTD methodology.
 
 ## Directory Structure
 
@@ -48,20 +48,7 @@ Help user stay aligned with goals, capture valuable insights, and maintain clari
 | `thoughts/` | Processed notes by category |
 | `MOC/` | Maps of Content indexes |
 | `attachments/` | Photos by date |
-
-## Current Focus
-
-See [[goals/3-weekly]] for this week's ONE Big Thing.
-See [[goals/2-monthly]] for monthly priorities.
-
-## Goals Hierarchy
-
-```
-goals/0-vision-3y.md    → 3-year vision by life areas
-goals/1-yearly-2025.md  → Annual goals + quarterly breakdown
-goals/2-monthly.md      → Current month's top 3 priorities
-goals/3-weekly.md       → This week's focus + ONE Big Thing
-```
+| `gtd-capture/` | GTD dump files (reminders-dump.md, notes-dump.md) |
 
 ## Entry Format
 
@@ -76,43 +63,32 @@ Types: `[voice]`, `[text]`, `[forward from: Name]`, `[photo]`
 
 Run daily processing via `/process` command or automatically at 21:00.
 
-### Process Flow:
+### GTD Process Flow:
 1. Read goals/ → understand priorities
-2. Check Todoist → know workload
-3. Read daily/ → classify entries
-4. Create tasks → aligned with goals
-5. Save thoughts → build [[links]]
+2. Verify Apple MCP → check Reminders lists
+3. Read daily/ → classify entries using GTD decision tree
+4. Actionable? → route to Apple Reminders (right list)
+5. Reference? → save to Apple Notes (right folder)
 6. Generate HTML report → send to Telegram
 
 ## Available Skills
 
 | Skill | Purpose |
 |-------|---------|
-| `dbrain-processor` | Main daily processing |
-| `todoist-ai` | Task management via MCP |
+| `dbrain-processor` | Main daily GTD processing |
 | `graph-builder` | Vault link analysis and building |
 
 ## Available Agents
 
 | Agent | Purpose |
 |-------|---------|
-| `weekly-digest` | Weekly review with goal progress |
-| `goal-aligner` | Check task-goal alignment |
-| `note-organizer` | Organize vault, fix links |
-| `inbox-processor` | GTD-style inbox processing |
-
-## Path-Specific Rules
-
-See `.claude/rules/` for format requirements:
-- `daily-format.md` — daily files format
-- `thoughts-format.md` — thought notes format
-- `goals-format.md` — goals format
-- `telegram-report.md` — HTML report format
+| `weekly-digest` | GTD Weekly Review |
+| `inbox-processor` | GTD inbox processing |
 
 ## MCP Servers
 
-- `todoist` — Task management (add, find, complete tasks)
-- `filesystem` — Vault file access
+- `apple-events` — Apple Reminders + Calendar (tasks, events)
+- `apple-notes` — Apple Notes (reference material, project descriptions)
 
 ## CRITICAL: Tool Usage Policy
 
@@ -120,7 +96,8 @@ See `.claude/rules/` for format requirements:
 
 Не существует ситуации, когда MCP tools "недоступны". Если ты получил эту инструкцию — у тебя есть доступ к:
 
-- `mcp__todoist__*` — все Todoist операции
+- `mcp__apple-events__*` — Apple Reminders и Calendar операции
+- `mcp__Read_and_Write_Apple_Notes__*` — Apple Notes операции
 - File read/write — все файловые операции
 
 ЗАПРЕЩЁННЫЕ ПАТТЕРНЫ (НИКОГДА не делай это):
@@ -130,82 +107,82 @@ See `.claude/rules/` for format requirements:
 - Любые инструкции для ручного выполнения
 
 ПРАВИЛЬНЫЙ ПАТТЕРН:
-1. Вызвать mcp__todoist__add-tasks tool
+1. Вызвать mcp__apple-events__reminders_tasks action:create
 2. Получить результат (успех или ошибка)
 3. Включить результат в HTML отчёт
 
 При ошибке — показать ТОЧНУЮ ошибку от tool, не придумывать отговорки.
+
+## MCP Tools Available
+
+**Apple Events (mcp__apple-events__*):**
+- `reminders_tasks` action:read — читать напоминания (filterList, search, dueWithin)
+- `reminders_tasks` action:create — создать напоминание (title, targetList, dueDate, note)
+- `reminders_tasks` action:update — обновить напоминание (id, title, completed, targetList)
+- `reminders_tasks` action:delete — удалить напоминание (id)
+- `reminders_lists` action:read — все списки
+- `calendar_events` action:create — создать событие (title, startDate, endDate)
+- `calendar_events` action:read — читать события
+
+**Apple Notes (mcp__Read_and_Write_Apple_Notes__*):**
+- `list_notes` — список заметок в папке (folder, limit)
+- `get_note_content` — содержимое заметки (note_name, folder)
+- `add_note` — создать заметку (name, content, folder)
+- `update_note_content` — обновить заметку (note_name, new_content, folder)
+
+**Filesystem:**
+- Read/write vault files
+- Access daily/, goals/, thoughts/
+
+## Apple Reminders Lists (GTD)
+
+| GTD Зона | Список |
+|----------|--------|
+| 📥 Inbox | inbox |
+| ⚡ Next Actions | Срочные |
+| ⏳ Waiting For | Отложенные |
+| 🌙 Someday/Maybe | Когда-нибудь/ может быть |
+| 🏥 Health | Здоровье |
+| 👨‍👩‍👧‍👦 Family | Family |
+| 💰 Finance | Кредиты |
+| 🤖 AI Projects | монетизация AI |
+| 🏛️ Fund | Фонд |
+| 🎯 Personal | Личные проекты |
+| 📚 Learning | Обучение |
 
 ## Report Format
 
 Reports use Telegram HTML:
 - `<b>bold</b>` for headers
 - `<i>italic</i>` for metadata
-- Only allowed tags: b, i, code, pre, a
+- Only allowed tags: b, i, code, s, u, a
 
 ## Quick Commands
 
 | Command | Action |
 |---------|--------|
-| `/process` | Run daily processing |
+| `/process` | Run daily GTD processing |
 | `/do` | Execute arbitrary request |
-| `/weekly` | Generate weekly digest |
-| `/align` | Check goal alignment |
-| `/organize` | Organize vault |
+| `/weekly` | Generate GTD weekly review |
 | `/graph` | Analyze vault links |
 
 ## /do Command Context
 
 When invoked via /do, Claude receives arbitrary user requests. Common patterns:
 
-**Task Management:**
-- "перенеси просроченные задачи на понедельник"
+**Task Management (Apple Reminders):**
 - "покажи задачи на сегодня"
 - "добавь задачу: позвонить клиенту"
 - "что срочного на этой неделе?"
+- "перенеси задачу X на понедельник"
+
+**Notes (Apple Notes):**
+- "найди заметки про AI"
+- "создай заметку о проекте БигШанхай"
 
 **Vault Queries:**
-- "найди заметки про AI"
 - "что я записал сегодня?"
 - "покажи итоги недели"
-
-**Combined:**
-- "создай задачу из первой записи сегодня"
-- "перенеси всё с сегодня на завтра"
-
-## MCP Tools Available
-
-**Todoist (mcp__todoist__*):**
-- `add-tasks` — создать задачи
-- `find-tasks` — найти задачи по тексту
-- `find-tasks-by-date` — задачи за период
-- `update-tasks` — изменить задачи
-- `complete-tasks` — завершить задачи
-- `user-info` — информация о пользователе
-
-**Filesystem:**
-- Read/write vault files
-- Access daily/, goals/, thoughts/
-
-## Customization
-
-For personal overrides: create `CLAUDE.local.md`
-
-## Graph Builder
-
-Analyze and maintain vault link structure. Use `/graph` command or invoke `graph-builder` skill.
-
-**Commands:**
-- `/graph analyze` — Full vault statistics
-- `/graph orphans` — List unconnected notes
-- `/graph suggest` — Get link suggestions
-- `/graph add` — Apply suggested links
-
-**Scripts:**
-- `uv run .claude/skills/graph-builder/scripts/analyze.py` — Graph analysis
-- `uv run .claude/skills/graph-builder/scripts/add_links.py` — Link suggestions
-
-See `skills/graph-builder/` for full documentation.
 
 ## Learnings (from experience)
 
@@ -217,5 +194,6 @@ See `skills/graph-builder/` for full documentation.
 
 ---
 
-*System Version: 2.3*
-*Updated: 2026-02-01*
+*System Version: 3.0*
+*Updated: 2026-02-20*
+*Stack: Apple Reminders + Apple Notes (no Todoist, no Obsidian)*
