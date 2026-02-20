@@ -12,7 +12,7 @@ from d_brain.bot.formatters import format_process_report
 from d_brain.bot.states import DoCommandState
 from d_brain.config import get_settings
 from d_brain.services.processor import ClaudeProcessor
-from d_brain.services.transcription import DeepgramTranscriber
+from d_brain.services.transcription import WhisperTranscriber
 
 router = Router(name="do")
 logger = logging.getLogger(__name__)
@@ -47,7 +47,7 @@ async def handle_do_input(message: Message, bot: Bot, state: FSMContext) -> None
     if message.voice:
         await message.chat.do(action="typing")
         settings = get_settings()
-        transcriber = DeepgramTranscriber(settings.deepgram_api_key)
+        transcriber = WhisperTranscriber(settings.openai_api_key)
 
         try:
             file = await bot.get_file(message.voice.file_id)
