@@ -7,6 +7,7 @@ from aiogram import Bot, Router
 from aiogram.types import Message
 
 from d_brain.config import get_settings
+from d_brain.services.git import VaultGit
 from d_brain.services.session import SessionStore
 from d_brain.services.storage import VaultStorage
 from d_brain.services.transcription import WhisperTranscriber
@@ -57,6 +58,10 @@ async def handle_voice(message: Message, bot: Bot) -> None:
             duration=message.voice.duration,
             msg_id=message.message_id,
         )
+
+        # Git commit & push
+        git = VaultGit(settings.vault_path)
+        git.commit_and_push(f"vault: voice entry {timestamp:%H:%M}")
 
         await message.answer(f"🎤 {transcript}\n\n✓ Сохранено")
         logger.info("Voice message saved: %d chars", len(transcript))

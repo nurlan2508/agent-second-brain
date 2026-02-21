@@ -7,6 +7,7 @@ from aiogram import Router
 from aiogram.types import Message
 
 from d_brain.config import get_settings
+from d_brain.services.git import VaultGit
 from d_brain.services.session import SessionStore
 from d_brain.services.storage import VaultStorage
 
@@ -34,6 +35,10 @@ async def handle_text(message: Message) -> None:
         text=message.text,
         msg_id=message.message_id,
     )
+
+    # Git commit & push
+    git = VaultGit(settings.vault_path)
+    git.commit_and_push(f"vault: text entry {timestamp:%H:%M}")
 
     await message.answer("✓ Сохранено")
     logger.info("Text message saved: %d chars", len(message.text))
