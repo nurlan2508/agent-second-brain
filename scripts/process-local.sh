@@ -4,6 +4,7 @@ set -e
 # Local Mac processing script
 # Pulls vault from VPS, runs Claude with Apple MCP, pushes back
 
+source "$HOME/.local/bin/env" 2>/dev/null || true
 export PATH="$HOME/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:$PATH"
 
 # Paths

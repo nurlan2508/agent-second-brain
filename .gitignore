@@ -21,6 +21,9 @@ node_modules/
 *.swo
 *~
 
+# Claude worktrees
+.claude/worktrees/
+
 # OS
 .DS_Store
 Thumbs.db
