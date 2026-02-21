@@ -8,10 +8,9 @@ from aiogram.filters import Command, CommandObject
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 
-from d_brain.bot.formatters import format_process_report
 from d_brain.bot.states import DoCommandState
 from d_brain.config import get_settings
-from d_brain.services.processor import ClaudeProcessor
+from d_brain.services.claude_api_processor import ClaudeAPIProcessor
 from d_brain.services.transcription import WhisperTranscriber
 
 router = Router(name="do")
@@ -87,36 +86,29 @@ async def handle_do_input(message: Message, bot: Bot, state: FSMContext) -> None
 
 
 async def process_request(message: Message, prompt: str, user_id: int = 0) -> None:
-    """Process the user's request with Claude."""
-    status_msg = await message.answer("⏳ Выполняю...")
+    """Process the user's request with Claude API and create tasks/notes."""
+    status_msg = await message.answer("⏳ Обрабатываю...")
 
     settings = get_settings()
-    processor = ClaudeProcessor(settings.vault_path)
+    processor = ClaudeAPIProcessor(
+        settings.vault_path,
+        str(settings.google_credentials_path),
+    )
 
-    async def run_with_progress() -> dict:
-        task = asyncio.create_task(
-            asyncio.to_thread(processor.execute_prompt, prompt, user_id)
-        )
-
-        elapsed = 0
-        while not task.done():
-            await asyncio.sleep(30)
-            elapsed += 30
-            if not task.done():
-                try:
-                    await status_msg.edit_text(
-                        f"⏳ Выполняю... ({elapsed // 60}m {elapsed % 60}s)"
-                    )
-                except Exception:
-                    pass
-
-        return await task
-
-    report = await run_with_progress()
-
-    formatted = format_process_report(report)
     try:
-        await status_msg.edit_text(formatted)
-    except Exception:
-        # Fallback: send without HTML parsing
-        await status_msg.edit_text(formatted, parse_mode=None)
+        result = await asyncio.to_thread(processor.process_entry, prompt, user_id)
+
+        # Format response for Telegram
+        if result.get("type") == "error":
+            response = f"❌ {result.get('status', 'Unknown error')}"
+        else:
+            response = (
+                f"✓ <b>{result.get('type', 'unknown').upper()}</b>\n"
+                f"<b>{result.get('title', 'Untitled')}</b>\n"
+                f"<i>{result.get('status', 'Processing...')}</i>"
+            )
+
+        await status_msg.edit_text(response)
+    except Exception as e:
+        logger.exception("Error processing request")
+        await status_msg.edit_text(f"❌ Ошибка: {e}")
