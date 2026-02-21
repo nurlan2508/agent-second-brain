@@ -1,95 +1,42 @@
 ---
-type: monthly
-period: YYYY-MM
-updated: YYYY-MM-DD
+type: goals
+period: monthly
+year: 2026
+month: 2
 ---
 
-# Monthly Focus
+# 🎯 Месячные цели на февраль 2026
 
-## Top 3 Priorities
+## 💼 Работа
+- [ ] Завершить Setup GTD системы
+- [ ] Запустить 1 новый проект
+- [ ] Получить 2 положительных отзыва от клиентов
 
-### Priority 1: [Your Top Priority]
-<!-- What MUST happen this month? -->
+## 💰 Финансы
+- [ ] ⚠️ Оплатить RBK кредит 65,806.91 РУБ (ПРОСРОЧЕН!)
+- [ ] Оплатить Халык 275,000 РУБ до 25.02
+- [ ] Отследить расходы на API
 
-**Why it matters:** [connection to yearly goal]
+## 💪 Здоровье
+- [ ] 12+ тренировок в месяц
+- [ ] Спать 7+ часов в день
+- [ ] Правильное питание 80%+ дней
 
-**Key Actions:**
-- [ ] Action 1
-- [ ] Action 2
-- [ ] Action 3
+## 👨‍👩‍👧‍👦 Семья
+- [ ] 4 выходных дня с семьей
+- [ ] 2 совместных проекта
 
-**Definition of Done:** [clear outcome]
-
----
-
-### Priority 2: [Second Priority]
-
-**Why it matters:** [connection to yearly goal]
-
-**Key Actions:**
-- [ ] Action 1
-- [ ] Action 2
-- [ ] Action 3
-
-**Definition of Done:** [clear outcome]
+## 🧠 Обучение
+- [ ] Пройти курс по AI/ML
+- [ ] Прочитать 2 книги
 
 ---
 
-### Priority 3: [Third Priority]
+## 📊 Статус
+Отслеживается в Weekly Review каждое воскресенье
 
-**Why it matters:** [connection to yearly goal]
+Неделя 1: (08.02-14.02)
+Неделя 2: (15.02-21.02) - в процессе
+Неделя 3: (22.02-28.02)
 
-**Key Actions:**
-- [ ] Action 1
-- [ ] Action 2
-- [ ] Action 3
-
-**Definition of Done:** [clear outcome]
-
----
-
-## NOT Doing This Month
-
-<!-- What are you consciously saying NO to? -->
--
--
--
-
----
-
-## Weekly Check-ins
-
-| Week | Progress | Blockers | Adjustments |
-|------|----------|----------|-------------|
-| W1 | | | |
-| W2 | | | |
-| W3 | | | |
-| W4 | | | |
-
----
-
-## End of Month Review
-
-**What worked:**
--
-
-**What didn't work:**
--
-
-**Key learnings:**
--
-
-**Next month focus:**
--
-
----
-
-## Links
-
-- [[0-vision-3y]] - 3-year vision
-- [[1-yearly-2025]] - Annual goals
-- [[3-weekly]] - This week's plan
-
----
-
-*Next Review: End of month*
+Updated: 2026-02-21

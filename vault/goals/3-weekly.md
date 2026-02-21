@@ -1,127 +1,42 @@
 ---
-type: weekly
-week: YYYY-WWW
-updated: YYYY-MM-DD
+type: goals
+period: weekly
+year: 2026
+week: 8
+start_date: 2026-02-21
+end_date: 2026-02-27
 ---
 
-# Weekly Focus
+# 🎯 Недельные цели на неделю 8 (21-27 февраля)
 
-## ONE Big Thing
+## 🔴 КРИТИЧЕСКИ СРОЧНО
+- [ ] **СЕГОДНЯ**: Оплатить RBK кредит 65,806.91 РУБ (просрочено на 3 дня!)
 
-> **If I accomplish nothing else, I will:**
-> [Single most important outcome for this week]
+## 🟡 ОЧЕНЬ СРОЧНО (до конца недели)
+- [ ] Оплатить Халык 275,000 РУБ (до 25.02)
+- [ ] Завершить Setup GTD системы
+- [ ] Отправить предложение BigShanghai Асхату
 
-<!-- This is read by the bot during daily processing -->
+## 🎯 Основные задачи на неделю
+- [ ] 3 тренировки
+- [ ] Прочитать 20+ страниц книги
+- [ ] Проанализировать возможности монетизации AI
+- [ ] 1 встреча с важным контактом
 
----
-
-## Week at a Glance
-
-**Week:** [X] of 52
-**Energy Level:** [High/Medium/Low]
-**Available Hours:** [X] hours focused work
-
----
-
-## Priority Tasks
-
-### Must Do (Non-negotiable)
-
-- [ ] Task 1 — Связь: [[1-yearly-2025#Goal]]
-- [ ] Task 2
-- [ ] Task 3
-
-### Should Do (Important)
-
-- [ ] Task 1
-- [ ] Task 2
-
-### Could Do (If time permits)
-
-- [ ] Task 1
-- [ ] Task 2
+## 📌 Приоритеты
+1. **Финансы**: платежи по кредитам
+2. **Работа**: GTD система + BigShanghai
+3. **Здоровье**: регулярные тренировки
+4. **Обучение**: AI монетизация
 
 ---
 
-## Daily Plan
+## ✅ Завершённое на неделе
+- [x] Создать Anthropic API ключ
+- [x] Настроить VPS бот
+- [x] Интегрировать Google сервисы
 
-### Monday
+## 📊 Статус
+Будет обновляться каждый день
 
-- [ ] Task 1
-- [ ] Task 2
-
-### Tuesday
-
-- [ ] Task 1
-- [ ] Task 2
-
-### Wednesday
-
-- [ ] Task 1
-- [ ] Task 2
-
-### Thursday
-
-- [ ] Task 1
-- [ ] Task 2
-
-### Friday
-
-- [ ] Task 1
-- [ ] Task 2
-
-### Weekend
-
-- [ ] Rest / Family time
-- [ ] Optional task
-
----
-
-## Key Meetings & Events
-
-| Day | Time | Event | Prep |
-|-----|------|-------|------|
-| Mon | | | |
-| Tue | | | |
-
----
-
-## Habits Tracker
-
-| Habit | Mon | Tue | Wed | Thu | Fri | Sat | Sun |
-|-------|-----|-----|-----|-----|-----|-----|-----|
-| [Habit 1] | | | | | | | |
-| [Habit 2] | | | | | | | |
-| [Habit 3] | | | | | | | |
-
----
-
-## End of Week Review
-
-### What Worked
-
--
-
-### What Didn't Work
-
--
-
-### Lessons Learned
-
--
-
-### Next Week Focus
-
->
-
----
-
-## Links
-
-- [[2-monthly]] - Monthly priorities
-- [[1-yearly-2025]] - Yearly goals
-- Previous: [[3-weekly-YYYY-WXX]]
-
----
-
-*Week Started: YYYY-MM-DD*
+Updated: 2026-02-21
