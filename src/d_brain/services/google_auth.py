@@ -3,6 +3,7 @@
 import json
 import logging
 from pathlib import Path
+from typing import Union
 
 from google.auth.transport.requests import Request
 from google.oauth2.service_account import Credentials
@@ -19,7 +20,7 @@ class GoogleAuthService:
         "https://www.googleapis.com/auth/calendar",
     ]
 
-    def __init__(self, credentials_path: str | Path) -> None:
+    def __init__(self, credentials_path: Union[str, Path]) -> None:
         """Initialize with service account credentials file.
 
         Args:

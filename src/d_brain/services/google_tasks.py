@@ -1,6 +1,7 @@
 """Google Tasks service for creating tasks."""
 
 import logging
+from typing import Union
 
 from google.auth.transport.requests import Request
 from googleapiclient.discovery import build
@@ -64,7 +65,7 @@ class GoogleTasksService:
         Args:
             title: Task title
             notes: Task notes/description
-            due_date: Due date in YYYY-MM-DD format
+            due_date: Due date in YYYY-MM-DD format (will be converted to RFC 3339)
 
         Returns:
             Created task object
@@ -76,7 +77,12 @@ class GoogleTasksService:
             if notes:
                 task_body["notes"] = notes
             if due_date:
-                task_body["due"] = due_date
+                # Convert YYYY-MM-DD to RFC 3339 format (required by Google Tasks API)
+                # The API expects format like "2026-02-25T00:00:00Z"
+                if len(due_date) == 10:  # YYYY-MM-DD format
+                    task_body["due"] = f"{due_date}T00:00:00Z"
+                else:
+                    task_body["due"] = due_date
 
             task = (
                 self.service.tasks()
