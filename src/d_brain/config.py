@@ -17,6 +17,10 @@ class Settings(BaseSettings):
 
     telegram_bot_token: str = Field(description="Telegram Bot API token")
     openai_api_key: str = Field(description="OpenAI API key for Whisper transcription")
+    google_credentials_path: Path = Field(
+        default=Path("./google-credentials.json"),
+        description="Path to Google Service Account credentials JSON file",
+    )
     vault_path: Path = Field(
         default=Path("./vault"),
         description="Path to vault directory",
