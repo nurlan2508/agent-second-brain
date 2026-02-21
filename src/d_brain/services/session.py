@@ -7,7 +7,7 @@ Inspired by Clawdbot's session persistence pattern.
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, Union
 
 
 class SessionStore:
@@ -17,7 +17,7 @@ class SessionStore:
     Entries are append-only for reliability and simplicity.
     """
 
-    def __init__(self, vault_path: Path | str) -> None:
+    def __init__(self, vault_path: Union[Path, str]) -> None:
         self.sessions_dir = Path(vault_path) / ".sessions"
         self.sessions_dir.mkdir(exist_ok=True)
 

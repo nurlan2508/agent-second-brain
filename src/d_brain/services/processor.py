@@ -5,7 +5,7 @@ import os
 import subprocess
 from datetime import date
 from pathlib import Path
-from typing import Any
+from typing import Any, Union, Optional
 
 from d_brain.services.session import SessionStore
 
@@ -120,7 +120,7 @@ week: {year}-W{week:02d}
                 moc_path.write_text(content)
                 logger.info("Updated MOC-weekly.md with link to %s", summary_path.stem)
 
-    def process_daily(self, day: date | None = None) -> dict[str, Any]:
+    def process_daily(self, day: Optional[date] = None) -> dict[str, Any]:
         """Process daily file with Claude.
 
         Args:
